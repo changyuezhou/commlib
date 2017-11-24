@@ -10,7 +10,7 @@
 #include "commlib/magic/src/rbtree.cc"
 #include "commlib/log/inc/handleManager.h"
 #include "commlib/cache/inc/index_group.h"
-#include "external/lib/inc/md5.h"
+#include "commlib/magic/inc/md5.h"
 
 using std::string;
 using lib::magic::SingletonHolder;

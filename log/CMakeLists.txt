@@ -5,6 +5,6 @@ project(log)
 AUX_SOURCE_DIRECTORY(./inc DIR_LOG_INC)
 AUX_SOURCE_DIRECTORY(./src DIR_LOG_SRC)
 
-add_library(log STATIC ${DIR_LOG_INC} ${DIR_LOG_SRC})
+ADD_LIBRARY(log STATIC ${DIR_LOG_INC} ${DIR_LOG_SRC})
 
-add_subdirectory(test)
+ADD_SUBDIRECTORY(test)

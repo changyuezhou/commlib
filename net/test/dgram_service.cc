@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string>
-#include "commlib/net/inc/netAddr.h"
+#include "commlib/net/inc/net_addr.h"
 #include "commlib/net/inc/dgram.h"
 #include "commlib/net/inc/stream.h"
 

@@ -2,15 +2,11 @@ cmake_minimum_required(VERSION 2.8.0)
 
 project(electionTest)
 
-ice_add_executable(election_service
-        ./election_service_test.cc
-        DEPENDS log magic etc dist_lib thread
-        LINK_LIBS log magic etc thread dist_lib pthread zookeeper_mt
-        )
+ADD_EXECUTABLE(election_service ./election_service_test.cc)
 
-ice_add_executable(election_cli
-        ./election_cli_test.cc
-        DEPENDS log magic etc dist_lib thread
-        LINK_LIBS log magic etc thread dist_lib pthread zookeeper_mt
-        )
+TARGET_LINK_LIBRARIES(election_service dist_lib log magic etc thread pthread zookeeper_mt)
+
+ADD_EXECUTABLE(election_cli ./election_cli_test.cc)
+
+TARGET_LINK_LIBRARIES(election_cli dist_lib log magic etc thread pthread zookeeper_mt)
 
