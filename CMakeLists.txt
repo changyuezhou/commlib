@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 2.8.0)
 
 project(commlib)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/make)
 include(common)
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 add_subdirectory(magic)
 add_subdirectory(etc)
