@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 2.8.0)
+
+project(db_lib)
+
+INCLUDE_DIRECTORIES(/usr/include/mysql)
+
+AUX_SOURCE_DIRECTORY(./inc DIR_DB_INC)
+AUX_SOURCE_DIRECTORY(./src DIR_DB_SRC)
+
+ADD_LIBRARY(db_lib STATIC ${DIR_DB_INC} ${DIR_DB_SRC})
+
+#ADD_SUBDIRECTORY(tools)
+#ADD_SUBDIRECTORY(test)
