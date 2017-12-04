@@ -30,7 +30,7 @@ namespace lib {
        
      public:
        CSQL() {}
-       explicit CSQL(const string & sql) {}
+       explicit CSQL(const string & sql): sql_(sql) {}
        virtual ~CSQL () {}
        
      public:

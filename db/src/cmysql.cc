@@ -99,6 +99,8 @@ namespace lib {
 
       do {
         MYSQL_RES *query_result = ::mysql_store_result(&connection_);
+        ::mysql_close(&connection_);
+        //::mysql_library_end();
         if (NULL == query_result) {
           LIB_DB_LOG_WARN("mysql query failed msg: " << ::mysql_error(&connection_));
 
@@ -114,6 +116,7 @@ namespace lib {
         MYSQL_FIELD *fields = ::mysql_fetch_fields(query_result);
         MYSQL_ROW row;
         while ((row = ::mysql_fetch_row(query_result))) {
+          printf("########################## %s\r\n", row[0]);
         /*
           RECORD record;
 
