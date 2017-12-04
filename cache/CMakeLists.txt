@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.0)
 
 project(cache_lib)
 
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../)
+
 AUX_SOURCE_DIRECTORY(./inc DIR_CACHE_INC)
 AUX_SOURCE_DIRECTORY(./src DIR_CACHE_SRC)
 
