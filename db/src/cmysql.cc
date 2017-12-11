@@ -99,40 +99,13 @@ namespace lib {
 
       do {
         MYSQL_RES *query_result = ::mysql_store_result(&connection_);
-        ::mysql_close(&connection_);
-        //::mysql_library_end();
         if (NULL == query_result) {
           LIB_DB_LOG_WARN("mysql query failed msg: " << ::mysql_error(&connection_));
 
           return -1;
         }
 
-        INT32 rd_size = ::mysql_num_rows(query_result);
-        if (0 >= rd_size) {
-          return 0;
-        }
-
-        INT32 num_fields = ::mysql_num_fields(query_result);
-        MYSQL_FIELD *fields = ::mysql_fetch_fields(query_result);
-        MYSQL_ROW row;
-        while ((row = ::mysql_fetch_row(query_result))) {
-          printf("########################## %s\r\n", row[0]);
-        /*
-          RECORD record;
-
-          for (INT32 i = 0; i < num_fields; ++i) {
-            if (NULL != row[i]) {
-              record.insert(make_pair(fields[i].name, row[i]));
-            } else {
-              record.insert(make_pair(fields[i].name, ""));
-            }
-          }
-
-          records.push_back(record);
-          */
-        }
-
-        ::mysql_free_result(query_result);
+        records.AddResult(query_result);
       } while (0 == ::mysql_next_result(&connection_));
 
       return 0;
