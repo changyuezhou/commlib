@@ -4,9 +4,9 @@ project(netTest)
 
 ADD_EXECUTABLE(service ./service.cc)
 
-TARGET_LINK_LIBRARIES(service net)
+TARGET_LINK_LIBRARIES(service net log magic etc pthread)
 
-ADD_EXECUTABLE(dgram_service ./dgram_service.cc)
+#ADD_EXECUTABLE(dgram_service ./dgram_service.cc)
 
-TARGET_LINK_LIBRARIES(dgram_service net)
+#TARGET_LINK_LIBRARIES(dgram_service net)
 

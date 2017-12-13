@@ -4,19 +4,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string>
-#include "commlib/net/inc/netAddr.h"
-#include "commlib/net/inc/dgram.h"
-#include "commlib/net/inc/stream.h"
+#include "commlib/net/inc/net_addr.h"
+#include "commlib/net/inc/sock.h"
+
 
 using std::string;
-using lib::net::DGramSvr;
-using lib::net::StreamSvr;
-using lib::net::SockDGram;
 using lib::net::SockStream;
 using lib::net::UnixStream;
 using lib::net::NetAddr;
-using lib::net::INetAddr;
-using lib::net::UNetAddr;
 using lib::net::Sock;
 
 INT32 main(INT32 argc, CHAR ** argv) {
@@ -25,7 +20,16 @@ INT32 main(INT32 argc, CHAR ** argv) {
     return -1;
   }
 
-  StreamSvr svr;
+  SockStream * sock = new SockStream();
+
+      NetAddr local;
+      local.Serialize(argv[1]);
+      INT32 result = 0;
+      if (NULL == sock || 0 != (result = sock->Listen(local, 5))) {
+        printf("listen failed addr:%s\r\n", argv[1]);
+        return 0;
+      }
+      /*  
   INT32 result = svr.Create(argv[1]);
   if (0 != result) {
     printf("create service failed result:%d", result);
@@ -63,9 +67,9 @@ INT32 main(INT32 argc, CHAR ** argv) {
 
     ::usleep(100);
   }
+  */
 
   delete sock;
-  delete net_addr;
 
   return 0;
 }
