@@ -21,7 +21,7 @@ namespace lib {
       if (NULL == index_mem_info || NULL == chunk_info) {
         LIB_CACHE_LOG_ERROR("IndexGroup initial failed node memory object is empty");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
       index_mem_info_ = index_mem_info;
 
@@ -32,14 +32,14 @@ namespace lib {
       if (NULL == index_mem_info_ || NULL == chunk_info) {
         LIB_CACHE_LOG_ERROR("IndexGroup initial failed node memory object is empty");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       pt_malloc_ = new PTMalloc(chunk_info);
       if (NULL == pt_malloc_) {
         LIB_CACHE_LOG_ERROR("IndexGroup initial failed pt malloc object is empty");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       if (IndexMemInfo::INDEX_GROUP_USABLE != index_mem_info_->flag_) {
@@ -71,13 +71,13 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup initial group info failed index memory object is empty");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       memset(index_mem_info_, 0x00, sizeof(IndexMemInfo));
       if (0 != InitialLock(&index_mem_info_->mutex_)) {
         LIB_CACHE_LOG_ERROR("IndexGroup initial index memory info lock failed");
-        return Err::kERR_NODE_GROUP_NODE_INITIAL_LOCK_FAILED;
+        return Err::kERR_INDEX_GROUP_INITIAL_MUTEX_FAILED;
       }
 
       Mutex mutex(&index_mem_info_->mutex_);
@@ -107,7 +107,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup load index node to tree failed memory info object is empty");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       if (IndexMemInfo::LINK_TAIL == index_mem_info_->used_group_link_head_ ||
@@ -125,7 +125,7 @@ namespace lib {
         if (NULL == node) {
           LIB_CACHE_LOG_ERROR("IndexGroup offset to node failed group index:" << group_index
                                                                              << " node index:" << node_index);
-          return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+          return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
         }
 
         index_nodes_lists_.Insert(node->index_key_, node);
@@ -143,7 +143,7 @@ namespace lib {
       if (NULL == pt_malloc_ || NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup allocate index group failed ptmalloc object is empty");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       if (index_mem_info_->total_group_count_ >= NodeMemInfo::MAX_GROUP_COUNT) {
@@ -155,7 +155,7 @@ namespace lib {
       if (NULL == index_group) {
         LIB_CACHE_LOG_ERROR("IndexGroup allocate index group failed maybe has no chunk plz check ptmalloc log .........");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       Mutex mutex(&index_mem_info_->mutex_);
@@ -172,7 +172,7 @@ namespace lib {
       if (NULL == index_group || NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup initial index group failed .................");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       index_group->flag_ = IndexMemInfo::INDEX_GROUP_NOT_INITIAL;
@@ -386,14 +386,14 @@ namespace lib {
       if (NULL == pt_malloc_ || NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup allocate key node group failed ptmalloc or index_mem_info object is empty");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       KeyNodeGroup * key_node_group = reinterpret_cast<KeyNodeGroup *>(pt_malloc_->malloc(sizeof(KeyNodeGroup)));
       if (NULL == key_node_group) {
         LIB_CACHE_LOG_ERROR("IndexGroup allocate key node group failed maybe has no chunk plz check ptmalloc log .........");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       INT64 offset = CharPoint2Offset(reinterpret_cast<CHAR *>(key_node_group));
@@ -420,7 +420,7 @@ namespace lib {
       if (NULL == key_node_group || NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup initial key node group failed .................");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       for (INT32 i = (IndexMemInfo::KEY_NODES_PER_GROUP - 1); i >= 0; --i) {
@@ -472,7 +472,7 @@ namespace lib {
       if (0 >= key_node || NULL == head) {
         LIB_CACHE_LOG_ERROR("IndexGroup delete key node failed .................");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       if (IndexMemInfo::LINK_TAIL == *head) {
@@ -505,7 +505,7 @@ namespace lib {
       if (NULL == key_node) {
         LIB_CACHE_LOG_ERROR("IndexGroup delete key node failed .................");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       INT64 cur_node_offset = -1;
@@ -606,7 +606,7 @@ namespace lib {
       if (NULL == mutex) {
         LIB_CACHE_LOG_ERROR("IndexGroup initial mutex failed .................");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
       pthread_mutexattr_t attr;
       ::pthread_mutexattr_init(&attr);
@@ -699,7 +699,7 @@ namespace lib {
       if (NULL == index_mem_info_ || NULL == node) {
         LIB_CACHE_LOG_ERROR("IndexGroup get insert position failed .................");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       index_nodes_lists_.Insert(node->index_key_, node);
@@ -730,7 +730,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup insert index key:" << index_key << " unique key:" << unique_key << " failed .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       if (IsExists(index_key, unique_key)) {
@@ -830,7 +830,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup delete index key:" << index_key << " unique key:" << unique_key << " failed .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       IndexNodeRBTree::RBTreeNode * rb_node = index_nodes_lists_.Search(index_key);
@@ -985,7 +985,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup get keys index key:" << index_key << " failed index mem info object is empty .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       LIB_CACHE_LOG_DEBUG("IndexGroup get unique keys by index key:" << index_key << " EQ ....");
@@ -1010,7 +1010,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup get keys index key:" << index_key << " failed index mem info object is empty .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       LIB_CACHE_LOG_DEBUG("IndexGroup get unique keys by index key:" << index_key << " NE ....");
@@ -1050,7 +1050,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup get keys index key:" << index_key << " failed index mem info object is empty .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       LIB_CACHE_LOG_DEBUG("IndexGroup get unique keys by index key:" << index_key << " GT ....");
@@ -1084,7 +1084,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup get keys index key:" << index_key << " failed index mem info object is empty .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       LIB_CACHE_LOG_DEBUG("IndexGroup get unique keys by index key:" << index_key << " GTE ....");
@@ -1105,7 +1105,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup get lt keys index key:" << index_key << " failed index mem info object is empty .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       LIB_CACHE_LOG_DEBUG("IndexGroup get unique keys by index key:" << index_key << " LT ....");
@@ -1141,7 +1141,7 @@ namespace lib {
       if (NULL == index_mem_info_) {
         LIB_CACHE_LOG_ERROR("IndexGroup get lt keys index key:" << index_key << " failed index mem info object is empty .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       LIB_CACHE_LOG_DEBUG("IndexGroup get unique keys by index key:" << index_key << " LTE ....");
@@ -1165,7 +1165,7 @@ namespace lib {
                                                                     << max_index_key
                                                                     << " failed index mem info object is empty .");
 
-        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+        return Err::kERR_INDEX_GROUP_INFO_OBJECT_EMPTY;
       }
 
       LIB_CACHE_LOG_DEBUG("IndexGroup get unique keys by min index key:" << min_index_key

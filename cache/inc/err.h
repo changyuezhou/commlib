@@ -33,8 +33,11 @@ namespace lib {
        static const INT32 kERR_NODE_GROUP_HAS_NO_FREE_NODE = -100205;
        static const INT32 kERR_NODE_GROUP_NODE_OFFSET_INVALID = -100206;
        static const INT32 kERR_NODE_GROUP_COUNT_IS_TOO_MANY = -100207;
+       static const INT32 kERR_NODE_GROUP_ALLOCATE_BUFFER_FAILED = -100208;
+       static const INT32 kERR_NODE_GROUP_INITIAL_MUTEX_FAILED = -100209;
 
        static const INT32 kERR_CACHE_ALLOCATE_NODE_GROUP_FAILED = -100300;
+       static const INT32 kERR_INDEX_CACHE_ALLOCATE_INDEX_GROUP_FAILED = -100301;       
 
        static const INT32 kERR_INDEX_GROUP_KEY_INDEX_INVALID = -100400;
        static const INT32 kERR_INDEX_GROUP_INSERT_INDEX_NODE_OFFSET_INVALID = -100401;
@@ -42,6 +45,9 @@ namespace lib {
        static const INT32 kERR_INDEX_GROUP_HAS_NO_FREE_KEY_NODE = -100403;
        static const INT32 kERR_INDEX_GROUP_INDEX_KEY_IS_NOT_EXISTS = -100404;
        static const INT32 kERR_INDEX_GROUP_INDEX_KEY_HAS_NO_UNIQUE_KEY = -100405;
+       static const INT32 kERR_INDEX_GROUP_ALLOCATE_BUFFER_FAILED = -100406;   
+       static const INT32 kERR_INDEX_GROUP_INFO_OBJECT_EMPTY = -100407;    
+       static const INT32 kERR_INDEX_GROUP_INITIAL_MUTEX_FAILED = -100408;       
     };
   }  // namespace cache
 }  // namespace lib

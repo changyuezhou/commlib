@@ -3,9 +3,29 @@
 #include <string.h>
 #include "commlib/cache/inc/cache.h"
 #include "commlib/cache/inc/log.h"
+#include "commlib/cache/inc/err.h"
 
 namespace lib {
   namespace cache {
+    INT32 Cache::Initial(INT64 size, VOID * buffer) {
+      if (NULL == buffer) {
+        buffer = reinterpret_cast<CHAR *>(::malloc(size));
+        if (NULL == buffer) {
+          LIB_CACHE_LOG_ERROR("cache memory malloc failed size:" << size);
+
+          return Err::kERR_NODE_GROUP_ALLOCATE_BUFFER_FAILED;
+        }
+
+        memset(buffer, 0x00, size);
+        
+        need_free_ = TRUE;    
+      }
+
+      buffer_ = buffer;
+
+      return Initial(reinterpret_cast<NodeMemInfo *>(buffer), size);
+    }
+
     INT32 Cache::Initial(NodeMemInfo * node_mem_info, ChunkInfo * chunk_info) {
       if (NULL == node_mem_info || NULL == chunk_info) {
         LIB_CACHE_LOG_ERROR("node_mem_info or chunk_info is empty .................");
@@ -26,7 +46,7 @@ namespace lib {
       pthread_mutexattr_t attr;
       ::pthread_mutexattr_init(&attr);
       if (0 != ::pthread_mutex_init(&chunk_info->mutex_, &attr)) {
-        return -1;
+        return Err::kERR_NODE_GROUP_INITIAL_MUTEX_FAILED;
       }
       ::pthread_mutexattr_destroy(&attr);
       chunk_info->bottom_ = sizeof(NodeMemInfo) + sizeof(ChunkInfo);
@@ -118,6 +138,10 @@ namespace lib {
         delete node_group_;
         node_group_ = NULL;
       }
+      if (need_free_ && (buffer_ != NULL)) {
+        ::free(buffer_);
+        buffer_ = NULL;
+      }      
     }
   }  // namespace cache
 }  // namespace lib

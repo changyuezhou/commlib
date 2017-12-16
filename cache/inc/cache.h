@@ -24,10 +24,13 @@ namespace lib {
 
     class Cache {
      public:
-       explicit Cache():node_group_(NULL) {}
+       explicit Cache():node_group_(NULL), need_free_(FALSE), buffer_(NULL) {}
        ~Cache() { Destroy(); }
 
      public:
+       INT32 Initial(INT64 size, VOID * buffer = NULL);
+
+     protected:
        INT32 Initial(NodeMemInfo * node_mem_info, ChunkInfo * chunk_info);
        INT32 Initial(NodeMemInfo * node_mem_info, INT64 total_size);
 
@@ -54,6 +57,8 @@ namespace lib {
 
      private:
        NodeGroup * node_group_;
+       BOOL need_free_;
+       VOID * buffer_;
     };
   }  // namespace cache
 }  // namespace lib

@@ -28,29 +28,8 @@ INT32 main(INT32 argc, CHAR ** argv) {
   }
 
   INT32 size = 1024*1024*20;
-  CHAR * mem = reinterpret_cast<CHAR *>(::malloc(size));
-  if (NULL == mem) {
-    printf("memory malloc failed size: %d\n", size);
-
-    return 0;
-  }
-
-  memset(mem, 0x00, size);
-  NodeMemInfo * node_group = reinterpret_cast<NodeMemInfo *>(mem);
-  ChunkInfo * chunk_info = reinterpret_cast<ChunkInfo *>(reinterpret_cast<CHAR *>(mem) + sizeof(NodeMemInfo));
-  pthread_mutexattr_t attr;
-  ::pthread_mutexattr_init(&attr);
-  if (0 != ::pthread_mutex_init(&chunk_info->mutex_, &attr)) {
-    return -1;
-  }
-  ::pthread_mutexattr_destroy(&attr);
-  chunk_info->bottom_ = sizeof(NodeMemInfo) + sizeof(ChunkInfo);
-  chunk_info->chunk_start_ = chunk_info->bottom_;
-  chunk_info->top_ = size;
-  chunk_info->size_ = chunk_info->top_ - chunk_info->bottom_;
-
   Cache cache;
-  if (0 != cache.Initial(node_group, chunk_info)) {
+  if (0 != cache.Initial(size)) {
     printf("initial cache failed\n");
 
     return -1;
@@ -71,7 +50,6 @@ INT32 main(INT32 argc, CHAR ** argv) {
   printf("delete key:test success\n");
 
   delete HandleManager::GetInstance();
-  ::free(mem);
 
   return 0;
 }
