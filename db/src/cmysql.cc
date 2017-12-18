@@ -1,6 +1,7 @@
 // Copyright (c) 2013 zhou chang yue. All rights reserved.
 
 #include "commlib/db/inc/cmysql.h"
+#include "commlib/db/inc/cmysql_records.h"
 #include "commlib/db/inc/log.h"
 #include "commlib/db/inc/err.h"
 
@@ -82,33 +83,29 @@ namespace lib {
       return 0;
     }
 
-    INT32 CMySQL::Query(CRECORDS & records, const CSQL & sql) {
+    const CRECORDS * CMySQL::Query(const CSQL & sql) {
       if (0 != ::mysql_real_query(&connection_, sql.SQL().c_str(), sql.SQL().length())) {
         if ((1184 == ::mysql_errno(&connection_)) && (0 == reconnect())) {
           if (0 != ::mysql_real_query(&connection_, sql.SQL().c_str(), sql.SQL().length())) {
             LIB_DB_LOG_ERROR("mysql query failed msg: " << ::mysql_error(&connection_));
 
-            return -1;
+            return NULL;
           }
         } else {
           LIB_DB_LOG_ERROR("mysql query failed msg: " << ::mysql_error(&connection_));
 
-          return -1;
+          return NULL;
         }
       }
 
-      do {
-        MYSQL_RES *query_result = ::mysql_store_result(&connection_);
-        if (NULL == query_result) {
-          LIB_DB_LOG_WARN("mysql query failed msg: " << ::mysql_error(&connection_));
+      MYSQL_RES *query_result = ::mysql_store_result(&connection_);
+      if (NULL == query_result) {
+        LIB_DB_LOG_WARN("mysql query failed msg: " << ::mysql_error(&connection_));
 
-          return -1;
-        }
+        return NULL;
+      }
 
-        records.AddResult(query_result);
-      } while (0 == ::mysql_next_result(&connection_));
-
-      return 0;
+      return (new CMYSQL_RECORDS(query_result));
     }
 
     INT32 CMySQL::SignOut() {

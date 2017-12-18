@@ -41,16 +41,17 @@ INT32 main(INT32 argc, CHAR ** argv) {
   CSQL sql("select * from t_system");
 
   LIB_DB_LOG_DEBUG("sql:" << sql.SQL());
-  CRECORDS records;
-  mysql.Query(records, sql);
+  
+  const CRECORDS * records = mysql.Query(sql);
 
-  if (0 >= records.RecordsSize()) {
+  if (NULL == records || 0 >= records->RecordSize()) {
     printf("query records is empty\n");
   } else {
-    printf("records size:%d\n", records.RecordsSize());
+    printf("records size:%d\n", records->RecordSize());
 
-    printf("%s\n", records[0][0].c_str());
+    printf("%s\n", (*records)[0][1]);
   }
+
   /*
   if (!records[0].IsEmpty()) {
   } else {
@@ -58,6 +59,7 @@ INT32 main(INT32 argc, CHAR ** argv) {
   }
   */
   delete HandleManager::GetInstance();
+  delete records;
 
   return 0;
 }

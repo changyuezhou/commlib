@@ -141,7 +141,7 @@ namespace lib {
       if (need_free_ && (buffer_ != NULL)) {
         ::free(buffer_);
         buffer_ = NULL;
-      }      
+      }
     }
   }  // namespace cache
 }  // namespace lib

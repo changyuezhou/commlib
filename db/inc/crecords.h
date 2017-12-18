@@ -19,109 +19,29 @@
 namespace lib {
   namespace db {
     using std::string;
-    using std::vector;  
+    using std::vector;
 
-    class CRECORDS {
-     class CRECORD {
-      public:
-        CRECORD(MYSQL_ROW row, MYSQL_FIELD * fields, INT32 fields_num): row_(row), fields_(fields), fields_num_(fields_num) {}
-        CRECORD(const CRECORD & r): row_(r.row_), fields_(r.fields_), fields_num_(r.fields_num_) {}
-        virtual ~CRECORD() {}
+    typedef MYSQL_ROW ROW;
 
-      public:
-        BOOL IsEmpty() const { return 0 >= fields_num_; }  
-
-      public:
-        const string operator [] (INT32 index) const {
-          if (IsEmpty()) {
-            return "";
-          }
-
-          return row_[index]; 
-        }
-        const string operator [] (const string & column) const {
-          if (IsEmpty()) {
-            return "";
-          }
-
-          INT32 index = GetFieldIndex(column);
-          if (-1 == index) {
-            return "";
-          }
-
-          return row_[index];
-        }
-
-      protected:
-        INT32 GetFieldIndex(const string & column) const {
-          for (INT32 i = 0; i < fields_num_; ++i) {
-            if ((::strlen(fields_[i].name) == column.length()) && (0 == ::strncasecmp(fields_[i].name, column.c_str(), column.length()))) {
-              return i;
-            }
-          }
-
-          return -1;
-        }
-
-      public:
-        const CRECORD & operator=(const CRECORD & r) {
-          this->row_ = r.row_;
-          this->fields_ = r.fields_;
-          this->fields_num_ = r.fields_num_;
-
-          return *this;
-        }
-
-      public:
-        VOID Dump() const {
-          LIB_DB_LOG_DEBUG("Fields:");
-          for (INT32 i = 0; i < fields_num_; ++i) {
-            LIB_DB_LOG_DEBUG("Field name:" << fields_[i].name);
-            LIB_DB_LOG_DEBUG("Field value:" << (*row_)[i]);
-          }
-
-          LIB_DB_LOG_DEBUG("ROW:" << row_);
-        }
-
-      private:
-        MYSQL_ROW row_;
-        MYSQL_FIELD * fields_;
-        INT32 fields_num_;
-     };       
+    class CRECORDS {    
      public:
        CRECORDS() {}
-       virtual ~CRECORDS () { Destroy(); }
+       virtual ~CRECORDS () {}
 
      private:
        CRECORDS(const CRECORDS &);
        CRECORDS & operator=(const CRECORDS &);
 
      public:
-        typedef vector<MYSQL_RES *> RESULT_LIST;
-        typedef vector<CRECORD> RECORDS_LIST;
+       virtual ROW  operator [] (INT32 row) const = 0;
+       virtual ROW First() const = 0;
+       virtual ROW Next() const = 0;
 
      public:
-       INT32 AddResult(MYSQL_RES * result);
+       virtual INT32 RecordSize() const = 0;
 
-     public:
-       const CRECORD operator [] (INT32 index) {
-         INT32 records_size = records_list_.size();
-         if (0 >= records_size || 0 > index || index >= records_size) {
-           return CRECORD(NULL, NULL, 0);
-         }
-
-         return records_list_[index];
-       }
-
-     public:
-       INT32 RecordsSize() { return records_list_.size(); }
-
-     private:
-       VOID Destroy();
-       
-     private:
-        RESULT_LIST result_list_;
-        RECORDS_LIST records_list_;
+     protected:
+       virtual VOID Destroy() = 0;
     };
   }  // namespace db
 }  // namespace lib

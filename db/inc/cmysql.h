@@ -35,7 +35,7 @@ namespace lib {
        virtual INT32 SignIn();
 
        virtual INT32 Execute(const CSQL & sql, UINT32 affect = 0);
-       virtual INT32 Query(CRECORDS & records, const CSQL & sql);
+       virtual const CRECORDS * Query(const CSQL & sql);
 
        virtual INT32 SignOut();
 
