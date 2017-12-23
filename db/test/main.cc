@@ -21,7 +21,7 @@ using std::string;
 using std::vector;
 
 INT32 main(INT32 argc, CHAR ** argv) {
-  if (2 != argc) {
+  if (3 != argc) {
     printf("Usage:[config file]\r\n");
     return 0;
   }
@@ -38,8 +38,13 @@ INT32 main(INT32 argc, CHAR ** argv) {
     return -1;
   }
 
-  CSQL sql("select * from t_system");
-
+  CSQL sql(argv[2]);
+  result = sql.ParseSQL();
+  if (0 != result) {
+    printf("Parse SQL failed result:%d\n", result);
+  }
+  sql.Dump();
+/*
   LIB_DB_LOG_DEBUG("sql:" << sql.SQL());
   
   const CRECORDS * records = mysql.Query(sql);
@@ -52,14 +57,10 @@ INT32 main(INT32 argc, CHAR ** argv) {
     printf("%s\n", (*records)[0][1]);
   }
 
-  /*
-  if (!records[0].IsEmpty()) {
-  } else {
-    printf("record is empty\n");
-  }
-  */
-  delete HandleManager::GetInstance();
   delete records;
+*/
+
+  delete HandleManager::GetInstance();
 
   return 0;
 }
