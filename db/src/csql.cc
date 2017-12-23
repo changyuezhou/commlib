@@ -325,13 +325,16 @@ namespace lib {
 
       size_t end = rest_sql.find(" from ");
       if (string::npos == end) {
-        return "";
+        end = rest_sql.find(" FROM ");
+        if (string::npos == end) {
+          return "";
+        }
       }
 
       StringSplit split(rest_sql.substr(0, end), ",");
       INT32 column_size = split.size();
       for (INT32 i = 0; i < column_size; ++i) {
-        const string column = String::Trim_Left(String::Trim_Right(split[i]));
+        const string column = String::Trim_Right(String::Trim_Left(split[i]));
         if (column.at(0) != '*') {
           select_columns_.push_back(column);
         }
@@ -661,12 +664,16 @@ namespace lib {
         LIB_DB_LOG_ERROR("CSQL find conditions sql:" << sql << " is invalid");
         return Err::kERR_DB_SQL_CONDITION_INVALID;
       }
-      string rest_sql = String::Trim_Left(sql.substr(pos + 6));
+      string rest_sql = String::Trim_Right(String::Trim_Left(sql.substr(pos + 6)));
       
       LIB_DB_LOG_DEBUG("CSQL find conditions sql:" << rest_sql);
 
       if (end_key.at(0) == ';') {
-        conditions_str_ = rest_sql.substr(0, rest_sql.length() - 1);
+        if (';' != rest_sql.at(rest_sql.length() - 1)) {
+          conditions_str_ = rest_sql.substr(0, rest_sql.length());
+        } else {
+          conditions_str_ = rest_sql.substr(0, rest_sql.length() - 1);          
+        }
 
         return FindConditionsItems(conditions_str_);
       }
