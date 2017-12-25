@@ -382,23 +382,39 @@ namespace lib {
       for (INT32 i = 0; i < condition_item_array.size(); ++i) {
         string item_str = String::Trim_Left(String::Trim_Right(condition_item_array[i]));
         LIB_DB_LOG_DEBUG("CSQL DoConditionItems item string:" << item_str);        
-        size_t column_end = item_str.find(" ");
+        size_t column_end = item_str.find_first_of("><= ");
         if (string::npos == column_end) {
           LIB_DB_LOG_ERROR("CSQL DoConditionItems sql condition:" << item_str << " is invalid");
           return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;          
         }
 
         const string column = item_str.substr(0, column_end);
-        item_str = String::Trim_Left(String::Trim_Right((item_str.substr(column_end+1))));
+        if (' ' == item_str.at(column_end)) {
+          item_str = String::Trim_Left(String::Trim_Right((item_str.substr(column_end+1))));
+        } else {
+          item_str = String::Trim_Left(String::Trim_Right((item_str.substr(column_end))));
+        }
 
-        size_t op_end = item_str.find(" ");
+        LIB_DB_LOG_DEBUG("CSQL DoConditionItems fetch column:" << column << " item_str:" << item_str << " .......");
+
+        size_t op_end = item_str.find_first_not_of("><= ");
         if (string::npos == op_end) {
           LIB_DB_LOG_ERROR("CSQL DoConditionItems sql condition:" << item_str << " is invalid");
           return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;          
         }
 
-        const string op = item_str.substr(0, op_end);
-        item_str = String::Trim_Left(String::Trim_Right((item_str.substr(op_end+1))));
+        if (0 == op_end) {
+          op_end = item_str.find_first_of(" ");
+          if (string::npos == op_end) {
+            LIB_DB_LOG_ERROR("CSQL DoConditionItems sql condition:" << item_str << " is invalid");
+            return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;          
+          }          
+        }
+
+        const string op = String::Trim_Left(String::Trim_Right(item_str.substr(0, op_end)));
+        item_str = String::Trim_Left(String::Trim_Right((item_str.substr(op_end))));
+
+        LIB_DB_LOG_DEBUG("CSQL DoConditionItems column:" << column << " op:" << op << " ..................");
 
         CONDITION_ITEM c_item;
 
@@ -557,9 +573,8 @@ namespace lib {
         if (!conditions_columns_.insert(make_pair(column, c_item)).second) {
           LIB_DB_LOG_ERROR("CSQL DoConditionItem insert condition:" << column << " failed");
           return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;
-        }        
+        }     
       }
-
       return 0;
     }
 
@@ -588,7 +603,7 @@ namespace lib {
           continue;
         }
 
-        convert2new += item;
+        convert2new += " " + item;
       }
 
       return DoConditionItems(convert2new, "AND");
