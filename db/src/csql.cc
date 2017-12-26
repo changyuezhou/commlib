@@ -484,7 +484,7 @@ namespace lib {
             }
           }
 
-          c_item.condition_op_ = NEQ;
+          c_item.condition_op_ = NE;
           c_item.value_ = value;
         }
 
@@ -537,6 +537,17 @@ namespace lib {
           c_item.value_ = value;
         }
 
+        if ((2 == op.length()) && (0 == ::strncasecmp(op.c_str(), "<>", op.length()))) {
+          string value = "";
+          INT32 result = FetchConditionColumnValue(item_str, value);
+          if (0 != result) {
+            return result;              
+          }
+
+          c_item.condition_op_ = NE;
+          c_item.value_ = value;
+        }        
+
         if ((1 == op.length()) && (0 == ::strncasecmp(op.c_str(), ">", op.length()))) {
           string value = "";
           INT32 result = FetchConditionColumnValue(item_str, value);
@@ -570,10 +581,18 @@ namespace lib {
           c_item.value_ = value;
         }                
 
-        if (!conditions_columns_.insert(make_pair(column, c_item)).second) {
-          LIB_DB_LOG_ERROR("CSQL DoConditionItem insert condition:" << column << " failed");
-          return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;
-        }     
+        CONDITIONS_LIST::iterator it = conditions_columns_.find(column);
+        if (it != conditions_columns_.end()) {
+          CONDITION_ITEM_LIST & list = it->second;
+          list.push_back(c_item);
+        } else {
+          CONDITION_ITEM_LIST list;
+          list.push_back(c_item);
+          if (!conditions_columns_.insert(make_pair(column, list)).second) {
+            LIB_DB_LOG_ERROR("CSQL DoConditionItem insert condition:" << column << " failed");
+            return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;
+          } 
+        }    
       }
       return 0;
     }
@@ -782,37 +801,39 @@ namespace lib {
       LIB_DB_LOG_DEBUG("conditions:" << conditions_str_);
       for (CONDITIONS_LIST::const_iterator c_it = conditions_columns_.cbegin(); c_it != conditions_columns_.cend(); ++c_it) {
         const string column = c_it->first;
-        const CONDITION_ITEM & c_item = c_it->second;
-        string op = "";
-        if (EQ == c_item.condition_op_) {
-          op = "=";
-        }
+        const CONDITION_ITEM_LIST & c_list = c_it->second;
+        for (UINT32 i = 0; i < c_list.size(); ++i) {
+          const CONDITION_ITEM & c_item = c_list[i];
+          string op = "";
+          if (EQ == c_item.condition_op_) {
+            op = "=";
+          }
 
-        if (NEQ == c_item.condition_op_) {
-          op = "!=";
-        }
+          if (NE == c_item.condition_op_) {
+            op = "<>";
+          }
 
-        if (LT == c_item.condition_op_) {
-          op = "<";
-        }
+          if (LT == c_item.condition_op_) {
+            op = "<";
+          }
 
-        if (ELT == c_item.condition_op_) {
-          op = "<=";
-        }
+          if (ELT == c_item.condition_op_) {
+            op = "<=";
+          }
 
-        if (GT == c_item.condition_op_) {
-          op = ">";
-        }
+          if (GT == c_item.condition_op_) {
+            op = ">";
+          }
 
-        if (EGT == c_item.condition_op_) {
-          op = ">=";
-        }
+          if (EGT == c_item.condition_op_) {
+            op = ">=";
+          }
 
-        if (RANGE == c_item.condition_op_) {
-          op = "RANGE";
+          if (RANGE == c_item.condition_op_) {
+            op = "RANGE";
+          }
+          LIB_DB_LOG_DEBUG("condition item:" << column << " " << op << " " << c_item.value_);
         }
-
-        LIB_DB_LOG_DEBUG("condition item:" << column << " " << op << " " << c_item.value_);
      }
       LIB_DB_LOG_DEBUG("SQL END ***************************************************************");
     }

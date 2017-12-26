@@ -25,17 +25,18 @@ namespace lib {
     class CSQL {
      public:
        enum OP {
-         INSERT = 1,
-         UPDATE = 2,
-         SELECT = 3,
-         DELETE = 4,
-         OTHERS = 99
+         INSERT = 1,                         // 创建
+         UPDATE = 2,                         // 更新
+         DELETE = 3,                         // 删除
+         SELECT = 4,                         // 查询
+         TRANSACTION = 5,                    // 事务操作
+         OTHERS = 99                         // 其他
        };
 
        enum CONDITION_OP
        {
           EQ = 1,
-          NEQ = 2,
+          NE = 2,
           LT = 3,
           ELT = 4,
           GT = 5,
@@ -54,7 +55,8 @@ namespace lib {
          string value_;
        } CONDITION_ITEM;
 
-       typedef map<string, CONDITION_ITEM> CONDITIONS_LIST;
+       typedef vector<CONDITION_ITEM> CONDITION_ITEM_LIST;
+       typedef map<string, CONDITION_ITEM_LIST> CONDITIONS_LIST;
        
      public:
        CSQL(): sql_(""), op_(OTHERS), is_access_cache_(TRUE) {}
@@ -108,7 +110,7 @@ namespace lib {
        CSQL(const CSQL &);
        CSQL & operator=(const CSQL &);
        
-     private:
+     protected:
        string sql_;
        string db_name_;
        string table_name_;
