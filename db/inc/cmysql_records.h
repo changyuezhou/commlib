@@ -47,6 +47,10 @@ namespace lib {
      public:
        virtual INT32 RecordSize() const;
 
+     public:
+       virtual INT32 Serialize(CHAR * data, INT32 size) { return 0; }
+       virtual INT32 Deserialize(const CHAR * data, INT32 size) { return 0; }       
+
      protected:
        virtual VOID Destroy();
 
