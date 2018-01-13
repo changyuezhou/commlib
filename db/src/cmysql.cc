@@ -54,10 +54,10 @@ namespace lib {
       return (0 == ::mysql_ping(&connection_));
     }
 
-    INT32 CMySQL::Execute(const CSQL & sql, UINT32 affect) {
-      if (0 != ::mysql_real_query(&connection_, sql.SQL().c_str(), sql.SQL().length())) {
+    INT32 CMySQL::Execute(const string & sql, UINT32 affect) {
+      if (0 != ::mysql_real_query(&connection_, sql.c_str(), sql.length())) {
         if ((1184 == ::mysql_errno(&connection_)) && (0 == reconnect())) {
-          if (0 != ::mysql_real_query(&connection_, sql.SQL().c_str(), sql.SQL().length())) {
+          if (0 != ::mysql_real_query(&connection_, sql.c_str(), sql.length())) {
             LIB_DB_LOG_ERROR("mysql execute failed msg: " << ::mysql_error(&connection_));
 
             return -1;
@@ -83,10 +83,10 @@ namespace lib {
       return 0;
     }
 
-    const CRECORDS * CMySQL::Query(const CSQL & sql) {
-      if (0 != ::mysql_real_query(&connection_, sql.SQL().c_str(), sql.SQL().length())) {
+    const CRECORDS * CMySQL::Query(const string & sql) {
+      if (0 != ::mysql_real_query(&connection_, sql.c_str(), sql.length())) {
         if ((1184 == ::mysql_errno(&connection_)) && (0 == reconnect())) {
-          if (0 != ::mysql_real_query(&connection_, sql.SQL().c_str(), sql.SQL().length())) {
+          if (0 != ::mysql_real_query(&connection_, sql.c_str(), sql.length())) {
             LIB_DB_LOG_ERROR("mysql query failed msg: " << ::mysql_error(&connection_));
 
             return NULL;

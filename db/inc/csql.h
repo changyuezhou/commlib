@@ -21,6 +21,8 @@ namespace lib {
     using std::vector;
     using std::map;
     using std::transform;
+    using std::find;
+    using std::make_pair;
     
     class CSQL {
      public:
@@ -41,7 +43,8 @@ namespace lib {
           ELT = 4,
           GT = 5,
           EGT = 6,
-          RANGE = 7
+          RANGE = 7,
+          COND_UNKNOWN = 99
        };
 
      public:
@@ -49,6 +52,7 @@ namespace lib {
        typedef vector<string> COLUMN_LIST;
        typedef vector<vector<string>> COLUMN_VALUES;
        typedef vector<string> COLUMN_VALUE;
+       typedef vector<string> COLUMN_GROUP_KEY;
 
        typedef struct _CONDITION_ITEM {
          CONDITION_OP condition_op_;
@@ -69,11 +73,18 @@ namespace lib {
       
      public:
        const string & SQL() const { return sql_; }
-       const string & TableName() { return table_name_; }
-       
+       const string & TableName() const { return table_name_; }
+       BOOL IsAccessCache() const { return is_access_cache_; }
+
      public:
-       BOOL IsConditionHasColumns(const string & columns) { return FALSE; }
-       BOOL IsUpdateHasColumns(const string & columns) { return FALSE; }
+       BOOL IsConditionHasColumns(const string & column) const;
+       BOOL IsUpdateHasColumns(const string & column) const;
+       BOOL IsConditionsOPNoDiff() const;
+
+     public:  
+       INT32 ConditionsColumnCount() const { return conditions_columns_.size(); }
+       BOOL GetColumnGroupKeys(const COLUMN_LIST & column_list, CONDITION_ITEM_LIST & group_keys);
+       BOOL GetColumnGroupKey(const string & column, CONDITION_ITEM_LIST & group_keys);
 
      public:
        VOID Dump();  

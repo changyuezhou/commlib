@@ -162,7 +162,111 @@ namespace lib {
       }
 
       return 0;
-    } 
+    }
+
+    BOOL CSQL::IsConditionHasColumns(const string & column) const {
+      if (conditions_columns_.find(column) != conditions_columns_.end()) {
+        return TRUE;
+      }
+
+      return FALSE;
+    }
+
+    BOOL CSQL::IsUpdateHasColumns(const string & column) const { 
+      if (find(update_columns_.begin(), update_columns_.end(), column) != update_columns_.end()) {
+        return TRUE;
+      }
+
+      return FALSE; 
+    }
+
+    BOOL CSQL::IsConditionsOPNoDiff() const {
+      if (0 >= conditions_columns_.size()) {
+        return FALSE;
+      }
+
+      map<CONDITION_OP, BOOL> op_value;
+      for (CONDITIONS_LIST::const_iterator c_it = conditions_columns_.cbegin(); c_it != conditions_columns_.cend(); ++c_it) {
+        if (c_it == conditions_columns_.cbegin()) {
+          for (UINT32 i = 0; i < c_it->second.size(); ++i) {
+            if (!op_value.insert(make_pair(c_it->second[i].condition_op_, TRUE)).second) {
+              LIB_DB_LOG_WARN("CSQL conditions diff insert op:" << c_it->second[i].condition_op_ << " failed");
+
+              return FALSE;
+            }
+          }          
+        } else {
+          if (op_value.size() != c_it->second.size()) {
+            return FALSE;
+          }
+
+          for (UINT32 i = 0; i < c_it->second.size(); ++i) {
+            if (op_value.find(c_it->second[i].condition_op_) == op_value.end()) {
+              return FALSE;
+            }
+          }
+        }
+      }
+
+      return TRUE;
+    }
+
+    BOOL CSQL::GetColumnGroupKey(const string & column, CONDITION_ITEM_LIST & group_keys) {
+      COLUMN_LIST list;
+      list.push_back(column);
+
+      if (FALSE == GetColumnGroupKeys(list, group_keys)) {
+        return FALSE;
+      }
+
+      return TRUE;
+    }
+
+    BOOL CSQL::GetColumnGroupKeys(const COLUMN_LIST & column_list, CONDITION_ITEM_LIST & group_keys) {
+      INT32 column_size = column_list.size();
+      if (0 >= column_size) {
+        LIB_DB_LOG_DEBUG("CSQL get column group keys list size is zero");
+        return FALSE;
+      }
+
+      map<CONDITION_OP, string> op_value;
+      for (INT32 i = 0; i < column_size; ++i) {
+        CONDITIONS_LIST::const_iterator c_it = conditions_columns_.find(column_list[i]);
+        if (c_it == conditions_columns_.cend()) {
+          return FALSE;
+        }
+
+        for (UINT32 j = 0; j < c_it->second.size(); ++j) {
+          map<CONDITION_OP, string>::iterator it = op_value.find(c_it->second[j].condition_op_);
+          if (1 <= i && it == op_value.end()) {
+            return FALSE;
+          }
+
+          if (1 <= i) {
+            it->second = it->second + "_" + c_it->second[j].value_;
+          } else {
+            if (!op_value.insert(make_pair(c_it->second[j].condition_op_, c_it->second[j].value_)).second) {
+              LIB_DB_LOG_WARN("CSQL get column group keys insert column:" << column_list[i] << " op:" 
+                << c_it->second[j].condition_op_ << " column value:"
+                << c_it->second[j].value_
+                << " to list failed");
+
+              return FALSE;
+            }
+          }
+        }       
+      }
+
+      for (map<CONDITION_OP, string>::const_iterator c_it = op_value.cbegin(); c_it != op_value.cend(); ++c_it) {
+        CONDITION_ITEM item;
+        item.condition_op_ = c_it->first;
+        item.value_ = c_it->second;
+
+        group_keys.push_back(item);
+      }
+
+      return TRUE;
+    }
 
     const string CSQL::FindTableName(const string & sql, const string & begin_key, const string & end_key) {
       // process first key words like: into, from, update
@@ -584,7 +688,17 @@ namespace lib {
         CONDITIONS_LIST::iterator it = conditions_columns_.find(column);
         if (it != conditions_columns_.end()) {
           CONDITION_ITEM_LIST & list = it->second;
-          list.push_back(c_item);
+          BOOL is_op_exist = FALSE;
+          for (UINT32 j = 0; j < list.size(); ++j) {
+            if (c_item.condition_op_ == list[j].condition_op_) {
+              list[j].value_ = list[j].value_ + "," + c_item.value_;
+              is_op_exist = TRUE;
+            }
+          }
+
+          if (!is_op_exist) {
+            list.push_back(c_item);
+          }
         } else {
           CONDITION_ITEM_LIST list;
           list.push_back(c_item);
