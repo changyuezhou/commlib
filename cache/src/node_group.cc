@@ -714,6 +714,8 @@ namespace lib {
       node->key_length_ = key.length();
       node->last_access_timestamp_ = TimeFormat::GetCurTimestampLong();
 
+      atomic_add(1, &(node_mem_info_->total_keys_));
+
       LIB_CACHE_LOG_DEBUG("NodeGroup set key:" << key << " set data to buffer success  .........");
       DumpNode(node);
       INT32 result = AddNode2Hash(hash_node);
@@ -772,6 +774,9 @@ namespace lib {
 
         LIB_CACHE_LOG_DEBUG("NodeGroup set key: " << key << " size:"
                                                   << size << " success not allocate chunk .................");
+
+        atomic_add(1, &(node_mem_info_->total_keys_));
+
         return UpdateNode2LRU(hash_node);
       }
 
@@ -831,6 +836,9 @@ namespace lib {
       node->last_access_timestamp_ = TimeFormat::GetCurTimestampLong();
 
       LIB_CACHE_LOG_DEBUG("NodeGroup set key:" << key << " size:" << size << " set data to buffer success  .........");
+
+      atomic_add(1, &(node_mem_info_->total_keys_));
+      
       DumpNode(node);
       INT32 result = AddNode2Hash(hash_node);
       if (0 != result) {
@@ -901,6 +909,8 @@ namespace lib {
       LIB_CACHE_LOG_DEBUG("NodeGroup delete key:" << key << " delete from lru success ....................");
       Mutex mutex(&node->mutex_);
       ScopeLock<Mutex> scope(&mutex);
+
+      atomic_sub(1, &(node_mem_info_->total_keys_));
 
       return RecycleNode(node);
     }

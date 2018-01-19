@@ -73,8 +73,15 @@ namespace lib {
       
      public:
        const string & SQL() const { return sql_; }
+       const string & ConditionsStr() const { return conditions_str_; }
        const string & TableName() const { return table_name_; }
        BOOL IsAccessCache() const { return is_access_cache_; }
+
+     public:
+       const COLUMN_VALUES & GetInsertValues() const { return insert_values_; }
+       const COLUMN_LIST & GetInsertColumns() const { return insert_columns_; }
+       const COLUMN_LIST & GetUpdateColumns() const { return update_columns_; }
+       const COLUMN_VALUE & GetUpdateValues() const { return update_values_; }
 
      public:
        BOOL IsConditionHasColumns(const string & column) const;

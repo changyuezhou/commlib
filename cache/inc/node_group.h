@@ -15,6 +15,7 @@
 #include "commlib/cache/inc/ptmalloc.h"
 #include "commlib/cache/inc/err.h"
 #include "commlib/magic/inc/mutex.h"
+#include "commlib/magic/inc/atomic.h"
 #include "commlib/magic/inc/scopeLock.h"
 
 namespace lib {
@@ -67,6 +68,7 @@ namespace lib {
       INT32 used_node_link_head_;
       INT32 free_group_link_head_;
       INT32 free_node_link_head_;
+      atomic_t total_keys_;
     } NodeMemInfo;
 
     typedef struct _hash_node {
@@ -83,7 +85,7 @@ namespace lib {
       }
     } HashNode;
 
-    class NodeGroup: Thread {
+    class NodeGroup: public Thread {
      public:
        enum NODE_FLAG {
          FREE  = 0,
@@ -116,6 +118,7 @@ namespace lib {
 
      public:
        UINT64 LastAccessTimestamp();
+       UINT32 TotalKeys() { return node_mem_info_->total_keys_.counter; }
 
      public:
        virtual INT32 Working(VOID * parameter);

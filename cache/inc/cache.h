@@ -44,6 +44,7 @@ namespace lib {
        INT32 Get(const KEY & key, CHAR * data, INT32 * max_size);
        INT32 Set(const KEY & key, const CHAR * data, INT32 size);
        UINT64 LastAccessTimestamp();
+       UINT32 KeysCount() { return node_group_->TotalKeys(); }
 
      public:
        VOID Dump();
