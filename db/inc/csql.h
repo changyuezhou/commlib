@@ -90,8 +90,8 @@ namespace lib {
 
      public:  
        INT32 ConditionsColumnCount() const { return conditions_columns_.size(); }
-       BOOL GetColumnGroupKeys(const COLUMN_LIST & column_list, CONDITION_ITEM_LIST & group_keys);
-       BOOL GetColumnGroupKey(const string & column, CONDITION_ITEM_LIST & group_keys);
+       BOOL GetColumnGroupKeys (const COLUMN_LIST & column_list, CONDITION_ITEM_LIST & group_keys) const;
+       BOOL GetColumnGroupKey (const string & column, CONDITION_ITEM_LIST & group_keys) const ;
 
      public:
        VOID Dump();  

@@ -211,7 +211,7 @@ namespace lib {
       return TRUE;
     }
 
-    BOOL CSQL::GetColumnGroupKey(const string & column, CONDITION_ITEM_LIST & group_keys) {
+    BOOL CSQL::GetColumnGroupKey(const string & column, CONDITION_ITEM_LIST & group_keys) const {
       COLUMN_LIST list;
       list.push_back(column);
 
@@ -222,7 +222,7 @@ namespace lib {
       return TRUE;
     }
 
-    BOOL CSQL::GetColumnGroupKeys(const COLUMN_LIST & column_list, CONDITION_ITEM_LIST & group_keys) {
+    BOOL CSQL::GetColumnGroupKeys(const COLUMN_LIST & column_list, CONDITION_ITEM_LIST & group_keys) const {
       INT32 column_size = column_list.size();
       if (0 >= column_size) {
         LIB_DB_LOG_DEBUG("CSQL get column group keys list size is zero");
