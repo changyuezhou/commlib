@@ -88,10 +88,11 @@ namespace lib {
     class NodeGroup: public Thread {
      public:
        enum NODE_FLAG {
-         FREE  = 0,
-         CLEAN = 1,
-         DIRTY = 2,
-         KEY_NOT_EXISTS = 3
+         FREE  = 1,
+         CLEAN = 2,
+         DIRTY = 3,
+         KEY_NOT_EXISTS = 4,
+         IN_CACHE = 5
        };
 
      public:
@@ -119,6 +120,7 @@ namespace lib {
      public:
        UINT64 LastAccessTimestamp();
        UINT32 TotalKeys() { return node_mem_info_->total_keys_.counter; }
+       INT32 Status(const string & key);
 
      public:
        virtual INT32 Working(VOID * parameter);

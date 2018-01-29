@@ -61,7 +61,7 @@ namespace lib {
 
        typedef vector<CONDITION_ITEM> CONDITION_ITEM_LIST;
        typedef map<string, CONDITION_ITEM_LIST> CONDITIONS_LIST;
-       
+
      public:
        CSQL(): sql_(""), op_(OTHERS), is_access_cache_(TRUE) {}
        explicit CSQL(const string & sql): sql_(sql), op_(OTHERS), is_access_cache_(TRUE) {}
@@ -83,15 +83,18 @@ namespace lib {
        const COLUMN_LIST & GetUpdateColumns() const { return update_columns_; }
        const COLUMN_VALUE & GetUpdateValues() const { return update_values_; }
 
+       const COLUMN_LIST & GetSelectColumns() const { return select_columns_; }
+
+       const COLUMN_LIST GetConditionsColumns() const;
+       BOOL GetConditionsItems(const string & column, CONDITION_ITEM_LIST & item_list) const;
+
      public:
        BOOL IsConditionHasColumns(const string & column) const;
        BOOL IsUpdateHasColumns(const string & column) const;
-       BOOL IsConditionsOPNoDiff() const;
+       BOOL IsConditionsOPEQ(const string & column) const;
 
      public:  
        INT32 ConditionsColumnCount() const { return conditions_columns_.size(); }
-       BOOL GetColumnGroupKeys (const COLUMN_LIST & column_list, CONDITION_ITEM_LIST & group_keys) const;
-       BOOL GetColumnGroupKey (const string & column, CONDITION_ITEM_LIST & group_keys) const ;
 
      public:
        VOID Dump();  

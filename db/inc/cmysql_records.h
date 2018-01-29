@@ -48,7 +48,7 @@ namespace lib {
        virtual INT32 RecordSize() const;
 
      public:
-       virtual const CHAR * Data() { return 0; }
+       virtual const CHAR * Data() { return NULL; }
        virtual INT32 DataSize() { return 0; }
 
      protected:

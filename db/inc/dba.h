@@ -26,6 +26,15 @@ namespace lib {
 
     class DBA {
      public:
+       typedef struct _info {
+         string host_;
+         INT32 port_;
+         string db_;
+         string user_;
+         string pwd_;
+       } INFO;
+
+     public:
        enum DB_TYPE {
          MYSQL_TYPE = 1,
          ORACLE = 2,

@@ -106,6 +106,15 @@ namespace lib {
       return node_group_->Get(key, data, max_size);
     }
 
+    INT32 Cache::Status(const KEY & key) {
+      if (NULL == node_group_) {
+        LIB_CACHE_LOG_ERROR("cache node group is empty .................");
+        return Err::kERR_NODE_GROUP_INFO_OBJECT_EMPTY;
+      }
+
+      return node_group_->Status(key);
+    }
+
     INT32 Cache::Set(const KEY & key, const CHAR * data, INT32 size) {
       if (NULL == node_group_) {
         LIB_CACHE_LOG_ERROR("cache node group is empty .................");

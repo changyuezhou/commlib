@@ -873,6 +873,12 @@ namespace lib {
         return DIRTY;
       }
 
+      if (*max_size < node->data_size_) {
+        LIB_CACHE_LOG_DEBUG("NodeGroup get key:" << key << " data size: " << node->data_size_ << " max size:" << *max_size << " ......");
+        *max_size = node->data_size_;
+        return Err::kERR_NODE_GROUP_GET_BUFFER_IS_TOO_SMALL;
+      }
+
       ::memcpy(data, Offset2DataPoint(node->data_offset_), node->data_size_);
       *max_size = node->data_size_;
       node->last_access_timestamp_ = TimeFormat::GetCurTimestampLong();
@@ -880,6 +886,32 @@ namespace lib {
       LIB_CACHE_LOG_DEBUG("NodeGroup get key:" << key << " size:" << *max_size << " ....................");
 
       return UpdateNode2LRU(hash_node);
+    }
+
+    INT32 NodeGroup::Status(const string & key) {
+      LIB_CACHE_LOG_DEBUG("NodeGroup get key:" << key << " status ....................");
+      HashNode * hash_node = GetHashNodeFromHash(key);
+      if ((NULL == hash_node) || (NULL == hash_node->node_)) {
+        LIB_CACHE_LOG_DEBUG("NodeGroup get key status key:" << key << " is not exists ..............................");
+        return KEY_NOT_EXISTS;
+      }
+
+      LIB_CACHE_LOG_DEBUG("NodeGroup get key status key:" << key << " is exists ....................");
+      Mutex mutex(&hash_node->node_->mutex_);
+      ScopeLock<Mutex> scope(&mutex);
+
+      NodeMemInfo::Node * node = hash_node->node_;
+      if (0 >= node->data_offset_ || 0 >= node->data_size_) {
+        LIB_CACHE_LOG_DEBUG("NodeGroup get key status key:" << key << " data is not in cache ..............................");
+        return DIRTY;
+      }
+
+      if (DIRTY == node->flag_) {
+        LIB_CACHE_LOG_DEBUG("NodeGroup get key status key:" << key << " is dirty ....................");
+        return DIRTY;
+      }
+
+      return IN_CACHE;
     }
 
     INT32 NodeGroup::Del(const string & key) {
