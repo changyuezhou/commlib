@@ -73,6 +73,7 @@ namespace lib {
       
      public:
        const string & SQL() const { return sql_; }
+       OP GetOP() const { return op_; }
        const string & ConditionsStr() const { return conditions_str_; }
        const string & TableName() const { return table_name_; }
        BOOL IsAccessCache() const { return is_access_cache_; }
