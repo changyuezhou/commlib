@@ -320,7 +320,7 @@ namespace lib {
       UINT32 hash_id = DefHash(hash_node->node_->key_);
 
       if (NULL != hash_bucket_[hash_id/keys_hash_]) {
-        hash_node->hash_next_ = hash_bucket_[hash_id/keys_hash_]->hash_next_;
+        hash_node->hash_next_ = hash_bucket_[hash_id/keys_hash_];
       }
 
       hash_bucket_[hash_id/keys_hash_] = hash_node;

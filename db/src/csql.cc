@@ -646,18 +646,7 @@ namespace lib {
 
         CONDITIONS_LIST::iterator it = conditions_columns_.find(column);
         if (it != conditions_columns_.end()) {
-          CONDITION_ITEM_LIST & list = it->second;
-          BOOL is_op_exist = FALSE;
-          for (UINT32 j = 0; j < list.size(); ++j) {
-            if (c_item.condition_op_ == list[j].condition_op_) {
-              list[j].value_ = list[j].value_ + "," + c_item.value_;
-              is_op_exist = TRUE;
-            }
-          }
-
-          if (!is_op_exist) {
-            list.push_back(c_item);
-          }
+          it->second.push_back(c_item);
         } else {
           CONDITION_ITEM_LIST list;
           list.push_back(c_item);

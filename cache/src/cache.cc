@@ -43,16 +43,20 @@ namespace lib {
 
     INT32 Cache::Initial(NodeMemInfo * node_mem_info, INT64 total_size) {
       ChunkInfo * chunk_info = reinterpret_cast<ChunkInfo *>(reinterpret_cast<CHAR *>(node_mem_info) + sizeof(NodeMemInfo));
-      pthread_mutexattr_t attr;
-      ::pthread_mutexattr_init(&attr);
-      if (0 != ::pthread_mutex_init(&chunk_info->mutex_, &attr)) {
-        return Err::kERR_NODE_GROUP_INITIAL_MUTEX_FAILED;
+      if (NodeMemInfo::NODE_GROUP_USABLE != chunk_info->flag_) {
+        pthread_mutexattr_t attr;
+        ::pthread_mutexattr_init(&attr);
+        if (0 != ::pthread_mutex_init(&chunk_info->mutex_, &attr)) {
+          return Err::kERR_NODE_GROUP_INITIAL_MUTEX_FAILED;
+        }
+        ::pthread_mutexattr_destroy(&attr);
+        chunk_info->bottom_ = sizeof(NodeMemInfo) + sizeof(ChunkInfo);
+        chunk_info->chunk_start_ = chunk_info->bottom_;
+        chunk_info->top_ = total_size;
+        chunk_info->size_ = chunk_info->top_ - chunk_info->bottom_;
+
+        chunk_info->flag_ = NodeMemInfo::NODE_GROUP_USABLE;
       }
-      ::pthread_mutexattr_destroy(&attr);
-      chunk_info->bottom_ = sizeof(NodeMemInfo) + sizeof(ChunkInfo);
-      chunk_info->chunk_start_ = chunk_info->bottom_;
-      chunk_info->top_ = total_size;
-      chunk_info->size_ = chunk_info->top_ - chunk_info->bottom_;
 
       return Initial(node_mem_info, chunk_info);
     }
