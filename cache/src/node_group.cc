@@ -300,7 +300,9 @@ namespace lib {
         p = p->hash_next_;
       }
 
-      p->hash_next_ = hash_node->hash_next_;
+      if (NULL != p) {
+        p->hash_next_ = hash_node->hash_next_;
+      }
 
       return 0;
     }
@@ -939,9 +941,10 @@ namespace lib {
       delete hash_node;
 
       LIB_CACHE_LOG_DEBUG("NodeGroup delete key:" << key << " delete from lru success ....................");
+      /*
       Mutex mutex(&node->mutex_);
       ScopeLock<Mutex> scope(&mutex);
-
+      */
       atomic_sub(1, &(node_mem_info_->total_keys_));
 
       return RecycleNode(node);

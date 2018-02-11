@@ -28,9 +28,9 @@ namespace lib {
     using lib::magic::ScopeLock;
 
     typedef struct _node_mem_info {
-      static const INT32 MAX_GROUP_COUNT = 3; //65535;
+      static const INT32 MAX_GROUP_COUNT = 65535; //65535;
       static const INT32 HASH_BUCKET_LINK_LENGTH = 4;
-      static const INT32 NODES_PER_GROUP = 2;
+      static const INT32 NODES_PER_GROUP = 256;
       static const INT32 KEY_MAX_LENGTH = 256;
       static const INT64 LINK_TAIL = -1;
       static const INT64 NODE_GROUP_NOT_INITIAL = 0;

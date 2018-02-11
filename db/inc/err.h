@@ -97,6 +97,7 @@ namespace lib {
        static const INT32 kERR_DB_SQL_CONDITION_DO_BETWEEN_INVALID = -100460;
        static const INT32 kERR_DB_SQL_CONDITION_DO_ITEM_INVALID = -100461;
        static const INT32 kERR_DB_SQL_CONDITION_INVALID = -100462;
+       static const INT32 kERR_DB_SQL_CONDITION_NO_WHERE = -100463;
     };
   }  // namespace db
 }  // namespace lib

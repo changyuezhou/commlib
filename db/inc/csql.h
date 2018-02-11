@@ -127,6 +127,9 @@ namespace lib {
        INT32 DoConditionItems(const string & item, const string & key);
        INT32 FetchConditionColumnValue(string & item, string & value);
        BOOL CheckBracketIsAfterIN(const string & conditions);
+
+     protected:
+       VOID Clear();
        
      private:
        CSQL(const CSQL &);

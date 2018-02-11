@@ -31,6 +31,7 @@ namespace lib {
     }
 
     INT32 CSQL::ParseSQL(const string & sql) {
+      Clear();
       sql_ = sql;
       return ParseSQL();
     }
@@ -90,7 +91,12 @@ namespace lib {
         return result;
       }
 
-      return FindConditions(rest_sql, ";");
+      result = FindConditions(rest_sql, ";");
+      if (0 != result && Err::kERR_DB_SQL_CONDITION_NO_WHERE != result) {
+        return result;
+      }      
+
+      return 0;
     }
 
     INT32 CSQL::ParseDelete(const string & sql) {
@@ -110,9 +116,14 @@ namespace lib {
       if (string::npos != db_start) {
         db_name_ = table_name_.substr(0, db_start);
         table_name_ = table_name_.substr(db_start+1);
+      }
+
+      INT32 result = FindConditions(rest_sql, ";");
+      if (0 != result && Err::kERR_DB_SQL_CONDITION_NO_WHERE != result) {
+        return result;
       }      
 
-      return FindConditions(rest_sql, ";");
+      return 0;
     }
 
     INT32 CSQL::ParseSelect(const string & sql) {
@@ -152,7 +163,7 @@ namespace lib {
         && (string::npos == rest_sql.find(" limit ")) && (string::npos == rest_sql.find(" LIMIT ")) 
         && (string::npos == rest_sql.find(" having ")) && (string::npos == rest_sql.find(" HAVING "))) {
         INT32 result = FindConditions(rest_sql, ";", TRUE);
-        if (0 != result) {
+        if (0 != result && Err::kERR_DB_SQL_CONDITION_NO_WHERE != result) {
           return result;
         }
 
@@ -274,7 +285,7 @@ namespace lib {
 
       table_name_ = String::Trim_Left(String::Trim_Right(table_name));   
 
-      return String::Trim_Left(rest_sql.substr(table_name.length() + 1));
+      return String::Trim_Left(rest_sql.substr(table_name.length()));
     }
 
     INT32 CSQL::FindInsertColumn(const string & sql) {
@@ -757,8 +768,8 @@ namespace lib {
     INT32 CSQL::FindConditions(const string & sql, const string & end_key, BOOL need_parsing) {
       size_t pos = (string::npos == sql.find("where "))? sql.find("WHERE "):sql.find("where ");
       if (string::npos == pos) {
-        LIB_DB_LOG_ERROR("CSQL find conditions sql:" << sql << " is invalid");
-        return Err::kERR_DB_SQL_CONDITION_INVALID;
+        LIB_DB_LOG_DEBUG("CSQL find conditions sql:" << sql << " is not contain where .............");
+        return Err::kERR_DB_SQL_CONDITION_NO_WHERE;
       }
       string rest_sql = String::Trim_Right(String::Trim_Left(sql.substr(pos + 6)));
       
@@ -793,6 +804,22 @@ namespace lib {
       }
 
       return FindConditionsItems(conditions_str_);
+    }
+
+    VOID CSQL::Clear() {
+      sql_ = "";
+      db_name_ = "";
+      table_name_ = "";
+      conditions_str_ = "";
+      select_columns_.clear();
+      conditions_columns_.clear();
+      update_columns_.clear();
+      update_values_.clear();
+      insert_columns_.clear();
+      insert_values_.clear();
+      pages_.clear();
+      op_ = OTHERS;
+      is_access_cache_ = TRUE;
     }
 
     VOID CSQL::Dump() {
