@@ -428,6 +428,7 @@ namespace lib {
           LIB_DB_LOG_ERROR("CSQL FetchConditionColumnValue sql item:" << item << " is invalid");
           return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;
         }
+        value_end -= 1;
       } else if ('(' == item.at(0)) {
         value_start = 1;
         value_end = item.find(")", 1);
@@ -435,6 +436,7 @@ namespace lib {
           LIB_DB_LOG_ERROR("CSQL FetchConditionColumnValue sql item:" << item << " is invalid");
           return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;
         }
+        value_end -= 1;
       } else {
         value_end = item.find(" ");
       }
@@ -455,6 +457,9 @@ namespace lib {
       LIB_DB_LOG_DEBUG("CSQL DoConditionItems sql:" << item << " key:" << key);
       for (INT32 i = 0; i < condition_item_array.size(); ++i) {
         string item_str = String::Trim_Left(String::Trim_Right(condition_item_array[i]));
+        if (0 == ::strncasecmp(item_str.c_str(), "binary ", 7)) {
+          item_str = String::Trim_Left(item_str.substr(7));
+        }
         LIB_DB_LOG_DEBUG("CSQL DoConditionItems item string:" << item_str);        
         size_t column_end = item_str.find_first_of("><= ");
         if (string::npos == column_end) {
@@ -472,17 +477,15 @@ namespace lib {
         LIB_DB_LOG_DEBUG("CSQL DoConditionItems fetch column:" << column << " item_str:" << item_str << " .......");
 
         size_t op_end = item_str.find_first_not_of("><= ");
-        if (string::npos == op_end) {
-          LIB_DB_LOG_ERROR("CSQL DoConditionItems sql condition:" << item_str << " is invalid");
-          return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;          
-        }
-
-        if (0 == op_end) {
-          op_end = item_str.find_first_of(" ");
+        if (string::npos == op_end || 0 == op_end) {
+          op_end = item_str.find_first_of("(");
           if (string::npos == op_end) {
-            LIB_DB_LOG_ERROR("CSQL DoConditionItems sql condition:" << item_str << " is invalid");
-            return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;          
-          }          
+            op_end = item_str.find_first_of(" ");
+            if (string::npos == op_end) {
+              LIB_DB_LOG_ERROR("CSQL DoConditionItems sql condition:" << item_str << " is invalid");
+              return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;
+            }
+          }
         }
 
         const string op = String::Trim_Left(String::Trim_Right(item_str.substr(0, op_end)));
@@ -529,12 +532,12 @@ namespace lib {
         }  // do between end
 
         if ((3 == op.length()) && (0 == ::strncasecmp(op.c_str(), "not", op.length()))) {
-          if (0 != ::strncasecmp(item_str.c_str(), "in ", 3)) {
+          if (0 != ::strncasecmp(item_str.c_str(), "in", 2)) {
             LIB_DB_LOG_ERROR("CSQL DoConditionItems sql condition:" << item_str << " is invalid");            
             return Err::kERR_DB_SQL_CONDITION_DO_ITEM_INVALID;            
           }
 
-          item_str = String::Trim_Left(item_str.substr(3));
+          item_str = String::Trim_Left(item_str.substr(2));
 
           string value = "";
           INT32 result = FetchConditionColumnValue(item_str, value);
