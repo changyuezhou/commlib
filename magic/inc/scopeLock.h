@@ -22,6 +22,9 @@ namespace lib {
            lock_->UnLock();
          }
        }
+     public:
+       BOOL is_locked() { return is_locked_; }
+         
      private:
        Lock * lock_;
        BOOL is_locked_;

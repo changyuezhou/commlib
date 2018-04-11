@@ -24,6 +24,13 @@ namespace lib {
 
     class Cache {
      public:
+       enum CACHE_FLAG {
+         DIRTY = 3,
+         KEY_NOT_EXISTS = 4,
+         IN_CACHE = 5
+       };
+
+     public:
        explicit Cache():node_group_(NULL), need_free_(FALSE), buffer_(NULL) {}
        ~Cache() { Destroy(); }
 
@@ -44,6 +51,8 @@ namespace lib {
        INT32 Get(const KEY & key, CHAR * data, INT32 * max_size);
        INT32 Set(const KEY & key, const CHAR * data, INT32 size);
        UINT64 LastAccessTimestamp();
+       UINT32 KeysCount() { return node_group_->TotalKeys(); }
+       INT32 Status(const KEY & key);
 
      public:
        VOID Dump();

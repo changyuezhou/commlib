@@ -26,6 +26,15 @@ namespace lib {
 
     class DBA {
      public:
+       typedef struct _info {
+         string host_;
+         INT32 port_;
+         string db_;
+         string user_;
+         string pwd_;
+       } INFO;
+
+     public:
        enum DB_TYPE {
          MYSQL_TYPE = 1,
          ORACLE = 2,
@@ -45,8 +54,8 @@ namespace lib {
        virtual INT32 SignIn(const string & host, INT32 port, const string & db, const string & user, const string & pwd);
        virtual INT32 SignIn() = 0;
 
-       virtual INT32 Execute(const CSQL & sql, UINT32 affect = 0) = 0;
-       virtual const CRECORDS * Query(const CSQL & sql) = 0;
+       virtual INT32 Execute(const string & sql, UINT32 affect = 0) = 0;
+       virtual const CRECORDS * Query(const string & sql) = 0;
 
        virtual INT32 SignOut() = 0;
        virtual BOOL IsConnecting() = 0;

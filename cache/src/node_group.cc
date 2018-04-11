@@ -300,7 +300,9 @@ namespace lib {
         p = p->hash_next_;
       }
 
-      p->hash_next_ = hash_node->hash_next_;
+      if (NULL != p) {
+        p->hash_next_ = hash_node->hash_next_;
+      }
 
       return 0;
     }
@@ -320,7 +322,7 @@ namespace lib {
       UINT32 hash_id = DefHash(hash_node->node_->key_);
 
       if (NULL != hash_bucket_[hash_id/keys_hash_]) {
-        hash_node->hash_next_ = hash_bucket_[hash_id/keys_hash_]->hash_next_;
+        hash_node->hash_next_ = hash_bucket_[hash_id/keys_hash_];
       }
 
       hash_bucket_[hash_id/keys_hash_] = hash_node;
@@ -714,6 +716,8 @@ namespace lib {
       node->key_length_ = key.length();
       node->last_access_timestamp_ = TimeFormat::GetCurTimestampLong();
 
+      atomic_add(1, &(node_mem_info_->total_keys_));
+
       LIB_CACHE_LOG_DEBUG("NodeGroup set key:" << key << " set data to buffer success  .........");
       DumpNode(node);
       INT32 result = AddNode2Hash(hash_node);
@@ -772,6 +776,9 @@ namespace lib {
 
         LIB_CACHE_LOG_DEBUG("NodeGroup set key: " << key << " size:"
                                                   << size << " success not allocate chunk .................");
+
+        atomic_add(1, &(node_mem_info_->total_keys_));
+
         return UpdateNode2LRU(hash_node);
       }
 
@@ -831,6 +838,9 @@ namespace lib {
       node->last_access_timestamp_ = TimeFormat::GetCurTimestampLong();
 
       LIB_CACHE_LOG_DEBUG("NodeGroup set key:" << key << " size:" << size << " set data to buffer success  .........");
+
+      atomic_add(1, &(node_mem_info_->total_keys_));
+      
       DumpNode(node);
       INT32 result = AddNode2Hash(hash_node);
       if (0 != result) {
@@ -865,6 +875,12 @@ namespace lib {
         return DIRTY;
       }
 
+      if (*max_size < node->data_size_) {
+        LIB_CACHE_LOG_DEBUG("NodeGroup get key:" << key << " data size: " << node->data_size_ << " max size:" << *max_size << " ......");
+        *max_size = node->data_size_;
+        return Err::kERR_NODE_GROUP_GET_BUFFER_IS_TOO_SMALL;
+      }
+
       ::memcpy(data, Offset2DataPoint(node->data_offset_), node->data_size_);
       *max_size = node->data_size_;
       node->last_access_timestamp_ = TimeFormat::GetCurTimestampLong();
@@ -872,6 +888,32 @@ namespace lib {
       LIB_CACHE_LOG_DEBUG("NodeGroup get key:" << key << " size:" << *max_size << " ....................");
 
       return UpdateNode2LRU(hash_node);
+    }
+
+    INT32 NodeGroup::Status(const string & key) {
+      LIB_CACHE_LOG_DEBUG("NodeGroup get key:" << key << " status ....................");
+      HashNode * hash_node = GetHashNodeFromHash(key);
+      if ((NULL == hash_node) || (NULL == hash_node->node_)) {
+        LIB_CACHE_LOG_DEBUG("NodeGroup get key status key:" << key << " is not exists ..............................");
+        return KEY_NOT_EXISTS;
+      }
+
+      LIB_CACHE_LOG_DEBUG("NodeGroup get key status key:" << key << " is exists ....................");
+      Mutex mutex(&hash_node->node_->mutex_);
+      ScopeLock<Mutex> scope(&mutex);
+
+      NodeMemInfo::Node * node = hash_node->node_;
+      if (0 >= node->data_offset_ || 0 >= node->data_size_) {
+        LIB_CACHE_LOG_DEBUG("NodeGroup get key status key:" << key << " data is not in cache ..............................");
+        return DIRTY;
+      }
+
+      if (DIRTY == node->flag_) {
+        LIB_CACHE_LOG_DEBUG("NodeGroup get key status key:" << key << " is dirty ....................");
+        return DIRTY;
+      }
+
+      return IN_CACHE;
     }
 
     INT32 NodeGroup::Del(const string & key) {
@@ -899,8 +941,11 @@ namespace lib {
       delete hash_node;
 
       LIB_CACHE_LOG_DEBUG("NodeGroup delete key:" << key << " delete from lru success ....................");
+      /*
       Mutex mutex(&node->mutex_);
       ScopeLock<Mutex> scope(&mutex);
+      */
+      atomic_sub(1, &(node_mem_info_->total_keys_));
 
       return RecycleNode(node);
     }

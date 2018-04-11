@@ -15,6 +15,7 @@
 #include "commlib/cache/inc/ptmalloc.h"
 #include "commlib/cache/inc/err.h"
 #include "commlib/magic/inc/mutex.h"
+#include "commlib/magic/inc/atomic.h"
 #include "commlib/magic/inc/scopeLock.h"
 
 namespace lib {
@@ -27,9 +28,9 @@ namespace lib {
     using lib::magic::ScopeLock;
 
     typedef struct _node_mem_info {
-      static const INT32 MAX_GROUP_COUNT = 3; //65535;
+      static const INT32 MAX_GROUP_COUNT = 65535; //65535;
       static const INT32 HASH_BUCKET_LINK_LENGTH = 4;
-      static const INT32 NODES_PER_GROUP = 2;
+      static const INT32 NODES_PER_GROUP = 256;
       static const INT32 KEY_MAX_LENGTH = 256;
       static const INT64 LINK_TAIL = -1;
       static const INT64 NODE_GROUP_NOT_INITIAL = 0;
@@ -67,6 +68,7 @@ namespace lib {
       INT32 used_node_link_head_;
       INT32 free_group_link_head_;
       INT32 free_node_link_head_;
+      atomic_t total_keys_;
     } NodeMemInfo;
 
     typedef struct _hash_node {
@@ -83,13 +85,14 @@ namespace lib {
       }
     } HashNode;
 
-    class NodeGroup: Thread {
+    class NodeGroup: public Thread {
      public:
        enum NODE_FLAG {
-         FREE  = 0,
-         CLEAN = 1,
-         DIRTY = 2,
-         KEY_NOT_EXISTS = 3
+         FREE  = 1,
+         CLEAN = 2,
+         DIRTY = 3,
+         KEY_NOT_EXISTS = 4,
+         IN_CACHE = 5
        };
 
      public:
@@ -116,6 +119,8 @@ namespace lib {
 
      public:
        UINT64 LastAccessTimestamp();
+       UINT32 TotalKeys() { return node_mem_info_->total_keys_.counter; }
+       INT32 Status(const string & key);
 
      public:
        virtual INT32 Working(VOID * parameter);

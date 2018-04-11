@@ -47,6 +47,10 @@ namespace lib {
      public:
        virtual INT32 RecordSize() const;
 
+     public:
+       virtual const CHAR * Data() { return NULL; }
+       virtual INT32 DataSize() { return 0; }
+
      protected:
        virtual VOID Destroy();
 
